@@ -1,10 +1,12 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { Table } from "react-bootstrap";
+import _ from "lodash";
 import { fetchAllUser } from "../services/UserService";
 import ReactPaginate from "react-paginate";
 import ModalAddNew from "./ModalAddNew";
 import ModalEditUser from "./ModalEditUser";
+
 function TableUsers() {
   const [listUsers, setListUsers] = useState([]);
   const [totalUsers, setTotalUsers] = useState(0);
@@ -19,6 +21,14 @@ function TableUsers() {
   };
   const handleUpdateTable = (user) => {
     setListUsers([user, ...listUsers]);
+  };
+
+  const handleEditUserFromModal = (user) => {
+    let closeListUsers = _.cloneDeep(listUsers);
+    let index = listUsers.findIndex((item) => item.id === user.id);
+    closeListUsers[index].first_name = user.first_name;
+    setListUsers(closeListUsers);
+    console.log(listUsers, closeListUsers)
   };
   useEffect(() => {
     getUser(1);
@@ -118,6 +128,7 @@ function TableUsers() {
         show={isShowModalEdit}
         handleClose={handleClose}
         dataUserEdit={dataUserEdit}
+        handleEditUserFromModal={handleEditUserFromModal}
       />
     </>
   );
