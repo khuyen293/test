@@ -8,14 +8,13 @@ const ModalEditUser = (props) => {
   const [name, setName] = useState("");
   const [job, setJob] = useState("");
 
-  const handleEditUser = async() => {
+  const handleEditUser = async () => {
     let res = await putUpdateUser(name, job);
     if (res && res.updatedAt) {
       handleEditUserFromModal({
-        first_name: name, 
+        first_name: name,
         id: dataUserEdit.id,
-
-      })
+      });
       handleClose();
       toast.success("Update user success");
     }
@@ -27,9 +26,8 @@ const ModalEditUser = (props) => {
     }
   }, [dataUserEdit]);
 
-  console.log(dataUserEdit);
   return (
-    <Modal show={show} onHide={handleClose}>
+    <Modal show={show} onHide={handleClose} backdrop="static" keyboard={false}>
       <Modal.Header closeButton>
         <Modal.Title>Edit a user</Modal.Title>
       </Modal.Header>

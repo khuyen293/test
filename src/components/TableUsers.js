@@ -6,6 +6,7 @@ import { fetchAllUser } from "../services/UserService";
 import ReactPaginate from "react-paginate";
 import ModalAddNew from "./ModalAddNew";
 import ModalEditUser from "./ModalEditUser";
+import ModalConfirm from "./ModalConfirm";
 
 function TableUsers() {
   const [listUsers, setListUsers] = useState([]);
@@ -15,9 +16,13 @@ function TableUsers() {
 
   const [isShowModalEdit, setIsShowModalEdit] = useState(false);
   const [dataUserEdit, setDataUserEdit] = useState({});
+
+  const [isShowModalDelete, setIsShowModalDelete] = useState(false);
+  const [dataUserDelete, setDataUserDelete] = useState({})
   const handleClose = () => {
     setIsShowModalAddNew(false);
     setIsShowModalEdit(false);
+    setIsShowModalDelete(false);
   };
   const handleUpdateTable = (user) => {
     setListUsers([user, ...listUsers]);
@@ -28,12 +33,11 @@ function TableUsers() {
     let index = listUsers.findIndex((item) => item.id === user.id);
     closeListUsers[index].first_name = user.first_name;
     setListUsers(closeListUsers);
-    console.log(listUsers, closeListUsers)
   };
+
   useEffect(() => {
     getUser(1);
   }, []);
-
   const getUser = async (page) => {
     let res = await fetchAllUser(page);
     if (res && res.data) {
@@ -42,7 +46,6 @@ function TableUsers() {
       setTotalPages(res.total_pages);
     }
   };
-
   const handlePageClick = (event) => {
     getUser(event.selected + 1);
   };
@@ -51,6 +54,17 @@ function TableUsers() {
     setIsShowModalEdit(true);
     setDataUserEdit(user);
   };
+
+  const handleDeleteUser = (user) => {
+    setIsShowModalDelete(true);
+    setDataUserDelete(user);
+  }
+
+  const handleDeleteUserFormModal = (user) => {
+    let closeListUsers = _.cloneDeep(listUsers);
+    closeListUsers = closeListUsers.filter(item => item.id !== user.id);
+    setListUsers(closeListUsers);
+  }
 
   return (
     <>
@@ -92,7 +106,10 @@ function TableUsers() {
                     >
                       Edit
                     </button>
-                    <button className="btn btn-danger">Delete</button>
+                    <button
+                      className="btn btn-danger"
+                      onClick={() => handleDeleteUser(item)}
+                    >Delete</button>
                   </td>
                 </tr>
               );
@@ -130,6 +147,14 @@ function TableUsers() {
         dataUserEdit={dataUserEdit}
         handleEditUserFromModal={handleEditUserFromModal}
       />
+      <ModalConfirm
+        show={isShowModalDelete}
+        handleClose={handleClose}
+        dataUserDelete={dataUserDelete}
+        handleDeleteUserFormModal={handleDeleteUserFormModal}
+      />
+
+
     </>
   );
 }
