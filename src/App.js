@@ -1,6 +1,5 @@
 import "./App.scss";
 import { ToastContainer, toast } from "react-toastify";
-
 import Header from "./components/Header";
 import TableUsers from "./components/TableUsers";
 import Container from "react-bootstrap/Container";
@@ -10,8 +9,7 @@ function App() {
     <>
       <div className="app-container">
         <Header />
-        <Container>
-          
+        <Container>         
           <TableUsers />
         </Container>
         
