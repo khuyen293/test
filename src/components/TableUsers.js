@@ -5,12 +5,14 @@ import ReactPaginate from "react-paginate";
 import _ from "lodash";
 import { debounce } from "lodash";
 import { CSVLink, CSVDownload } from "react-csv";
+import Papa from "papaparse";
 
 import { fetchAllUser } from "../services/UserService";
 import ModalAddNew from "./ModalAddNew";
 import ModalEditUser from "./ModalEditUser";
 import ModalConfirm from "./ModalConfirm";
 import "./TableUser.scss";
+import { toast } from "react-toastify";
 
 function TableUsers() {
   const [listUsers, setListUsers] = useState([]);
@@ -126,6 +128,47 @@ function TableUsers() {
     }
   }
 
+  const handleImportCSV = (event) => {
+    if (event.target && event.target.files && event.target.files[0]) {
+      let file = event.target.files[0];
+
+      if (file.type !== "text/csv") {
+        toast.error("Only accept cvs files...");
+        return;
+      }
+    Papa.parse(file, {
+      complete: function(results) {
+        let rawCSV = results.data;
+        if (rawCSV.length > 0) {
+          if (rawCSV[0] && rawCSV[0].length === 4) {
+            if (rawCSV[0][0] !== "id" || rawCSV[0][1] !== "email" || rawCSV[0][2] !== "first_name" || rawCSV[0][3] !== "last_name") {
+              toast.error("Wrong format Heading CSV file");
+            } else {
+              let result = []
+              rawCSV.map((item, index) => {
+                if (index > 0 && item.length === 4) {
+                  let obj = {}
+                  obj.id = item[0];
+                  obj.email = item[1];
+                  obj.first_name = item[2];
+                  obj.last_name = item[3];
+                  result.push(obj);
+                }
+              })
+              setListUsers(result);
+            }
+          } else {
+            toast.error("Wrong format  CSV file");
+          }
+        } else {
+          toast.error("Wrong CSV")
+        }
+      }
+    });
+    }
+
+  }
+
   return (
     <>
       <div className="my-3 add-new">
@@ -137,7 +180,12 @@ function TableUsers() {
             <i className="fa-solid fa-upload"></i>
             Import
           </label>
-          <input id="test" type="file" hidden />
+          <input
+            id="test"
+            type="file"
+            hidden
+            onChange={(event) => handleImportCSV(event)}
+          />
           <CSVLink
             filename={"users.csv"}
             className="btn btn-primary"
