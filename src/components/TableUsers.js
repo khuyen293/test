@@ -29,6 +29,8 @@ function TableUsers() {
 
   const [keyword, setKeyword] = useState("");
 
+  const [dataExport, setDataExport] = useState([]);
+
   const handleClose = () => {
     setIsShowModalAddNew(false);
     setIsShowModalEdit(false);
@@ -107,6 +109,23 @@ function TableUsers() {
     ["Yezzi", "Min l3b", "ymin@cocococo.com"],
   ];
 
+  const getUsersExport = (event, done) => {
+    let result = [];
+    if (listUsers && listUsers.length > 0) {
+      result.push(["ID", "Email", "First Name", "Last Name"]);
+      listUsers.map((item, index) => {
+        let arr = [];
+        arr[0] = item.id;
+        arr[1] = item.email;
+        arr[2] = item.first_name;
+        arr[3] = item.last_name;
+        result.push(arr);
+      })
+      setDataExport(result);
+      done();
+    }
+  }
+
   return (
     <>
       <div className="my-3 add-new">
@@ -120,9 +139,11 @@ function TableUsers() {
           </label>
           <input id="test" type="file" hidden />
           <CSVLink
-            data={csvData}
             filename={"users.csv"}
             className="btn btn-primary"
+            data={dataExport}
+            asyncOnClick={true}
+            onClick={getUsersExport}
           >
             <i className="fa-solid fa-download"></i>
             Export
@@ -139,7 +160,6 @@ function TableUsers() {
         <input
           className="form-control"
           placeholder="Search user by email..."
-          // value={keyword}
           onChange={(event) => handleSearch(event)}
         />
       </div>
